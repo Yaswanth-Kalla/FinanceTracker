@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <!-- Include CSS -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/select.css">
+    <!-- Include Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<%- include('partials/header2') %> <!-- Header Include -->
+
+<div class="container">
+    <h1>Data Visualization</h1>
+    <div class="box">
+
+    <% if (!isPrediction) { %> 
+        <!-- Year Selection Dropdown for tracking data only -->
+        <label for="yearSelect">Select Year:</label>
+        <select id="yearSelect">
+            <% 
+                const years = [...new Set(tableData.rows.map(row => {
+                    const year = new Date(row[0]).getFullYear();
+                    return isNaN(year) ? null : year;  // Skip invalid years (NaN)
+                }))];
+                years.sort((a, b) => b - a);  // Sort years in descending order
+                years.forEach(year => {
+                    if (year) { // Only display valid years
+                    %>
+                        <option value="<%= year %>"><%= year %></option>
+                    <% 
+                    }
+                });
+            %>
+        </select>
+    <% } %>
+
+    <!-- Chart Type Selection Dropdown -->
+    <label for="chartTypeSelect">Select Chart Type:</label>
+    <select id="chartTypeSelect">
+        <option value="line">Line Chart</option>
+        <option value="bar">Bar Chart</option>
+        <option value="pie">Pie Chart</option>
+        <% if (!isPrediction) { %> 
+            <option value="transactionDetails">Transaction Details</option>
+        <% } %>
+    </select>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts">
+        <div class="chart-container" id="lineChartContainer" style="display: none;">
+            <h3>Line Chart</h3>
+            <canvas id="lineChart"></canvas>
+        </div>
+        <div class="chart-container" id="barChartContainer" style="display: none;">
+            <h3>Bar Chart</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-container" id="pieChartContainer" style="display: none;">
+            <h3>Pie Chart</h3>
+            <canvas id="pieChart"></canvas>
+        </div>
+        <% if (!isPrediction) { %> 
+            <div class="chart-container" id="transactionDetailsContainer" style="display: none;">
+                <h3>Transaction History Table</h3>
+                <table id="transactionTable" border="1">
+                    <thead>
+                        <tr>
+                            <% tableData.headers.forEach(header => { %>
+                                <th><%= header %></th>
+                            <% }); %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% tableData.rows.forEach((row, index) => { %>
+                            <tr data-year="<%= new Date(row[0]).getFullYear() %>" data-index="<%= index %>">
+                                <% row.forEach(cell => { %>
+                                    <td><%= cell %></td>
+                                <% }); %>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+
+                <div id="paginationControls">
+                    <button id="prevPage"> < </button>
+                    <span id="pageNumber" style="
+    padding-right: 5px;
+    padding-left: 5px;">Page 1</span>
+                    <button id="nextPage">></button>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- External JS for chart rendering and filtering -->
+<script>
+    const labels = <%- JSON.stringify(chartData.labels) %>;
+    const values = <%- JSON.stringify(chartData.values) %>;
+
+    // Initialize Charts
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    const lineChart = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Monthly Expenditure',
+                data: values,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    const barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Monthly Expenditure',
+                data: values,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    const pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Monthly Expenditure',
+                data: values,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    <% if (!isPrediction) { %> 
+        let tableRows = Array.from(document.querySelectorAll('#transactionTable tbody tr'));
+        let filteredRows = [...tableRows];  // Initial rows are unfiltered
+
+        // Function to update the table based on selected year
+        function filterTableByYear(year) {
+            filteredRows = tableRows.filter(row => {
+                const rowYear = parseInt(row.getAttribute('data-year'));
+                return rowYear === year;
+            });
+            updatePagination();  // Update pagination after filtering
+        }
+
+        // Year Selection Handler
+        document.getElementById('yearSelect').addEventListener('change', function () {
+            const selectedYear = parseInt(this.value);
+            filterTableByYear(selectedYear);
+
+            // Update charts for the selected year
+            const yearLabels = [];
+            const yearValues = [];
+            labels.forEach((label, index) => {
+                const [month, year] = label.split('/');
+                if (parseInt(year) === selectedYear) {
+                    yearLabels.push(label);
+                    yearValues.push(values[index]);
+                }
+            });
+
+            lineChart.data.labels = yearLabels;
+            lineChart.data.datasets[0].data = yearValues;
+            lineChart.update();
+
+            barChart.data.labels = yearLabels;
+            barChart.data.datasets[0].data = yearValues;
+            barChart.update();
+
+            pieChart.data.labels = yearLabels;
+            pieChart.data.datasets[0].data = yearValues;
+            pieChart.update();
+        });
+
+        // Pagination Controls
+        let currentPage = 1;
+        const rowsPerPage = 10;
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const currentRows = filteredRows.slice(startIndex, endIndex);
+
+            // Hide all rows first
+            tableRows.forEach(row => row.style.display = 'none');
+            // Show the rows for the current page
+            currentRows.forEach(row => row.style.display = '');
+
+            // Update page number display
+            document.getElementById('pageNumber').textContent = `Page ${currentPage} of ${totalPages}`;
+
+            // Disable/Enable pagination buttons
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        document.getElementById('prevPage').addEventListener('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePagination();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', function () {
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePagination();
+            }
+        });
+
+        // Trigger default year and chart type change
+        document.getElementById('yearSelect').dispatchEvent(new Event('change'));
+    <% } %>
+
+    // Chart Type Change Handler
+    document.getElementById('chartTypeSelect').addEventListener('change', function () {
+        const selectedChartType = this.value;
+
+        // Hide all charts and tables
+        document.querySelectorAll('.chart-container').forEach(container => {
+            container.style.display = 'none';
+        });
+
+        // Show the selected chart or table
+        if (selectedChartType === 'line') {
+            document.getElementById('lineChartContainer').style.display = 'block';
+        } else if (selectedChartType === 'bar') {
+            document.getElementById('barChartContainer').style.display = 'block';
+        } else if (selectedChartType === 'pie') {
+            document.getElementById('pieChartContainer').style.display = 'block';
+        } else if (selectedChartType === 'transactionDetails') {
+            document.getElementById('transactionDetailsContainer').style.display = 'block';
+        }
+    });
+
+    // Trigger change to show default chart type
+    document.getElementById('chartTypeSelect').dispatchEvent(new Event('change'));
+
+    <% if (!isPrediction) { %> 
+        // Trigger change to display current year data by default
+        document.getElementById('yearSelect').dispatchEvent(new Event('change'));
+    <% } %>
+</script>
+
+</body>
+</html>

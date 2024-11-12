@@ -1,0 +1,90 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon_io/android-chrome-512x512.png" sizes="64x64" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/specific.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css" />
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <title>Finance Tracker - A Personal Finance App</title>
+  </head>
+
+  <body>
+    <%- include('partials/header') %> <!-- Header include -->
+
+    <!-- Flash messages section -->
+    <% if (error) { %>
+      <div class="flash-message error">
+        <p><%= error %></p>
+      </div>
+    <% } %>
+    <% if (success) { %>
+      <div class="flash-message success">
+        <p><%= success %></p>
+      </div>
+    <% } %>
+
+    <!-- Landing Page Content -->
+    <section class="section-box">
+      <div class="main-landing">
+        <div class="content">
+          <h1 class="under-welcome-h1">Take Control of Your Finances</h1>
+          <p class="under-welcome-p">
+            Track your income and expenses effortlessly. Manage your budget, set financial goals, and make smarter decisions for a more secure future.
+          </p>
+          <a href="/login" class="under-welcome-btn">Sign Up Now</a>
+        </div>
+        <div class="under-welcome-image">
+          <img src="/assets/makeme.png" alt="Power Finance" />
+        </div>
+      </div>
+    </section>
+
+
+    <section class="how-it-works" id="how-it-works">
+      <div class="head-text">
+        <h1>How it works</h1>
+      </div>
+      <br />
+      <div class="working-content">
+        <div class="left-working">
+          <h5 class="working-head">
+            Experience the power of
+            <span class="text-lightBlue">Personal Finance Tracker</span>
+          </h5>
+          <ul class="ul-items">
+            <li class="check-list-items">
+              <i data-feather="check" class="feather icon-check"></i>
+              <span>Track effortlessly</span>
+            </li>
+            <li class="check-list-items">
+              <i data-feather="check" class="feather icon-check"></i>
+              <span>Control transactions</span>
+            </li>
+            <li class="check-list-items">
+              <i data-feather="check" class="feather icon-check"></i>
+              <span>Customize currencies</span>
+            </li>
+            <li class="check-list-items">
+              <i class="icon-check" data-feather="check"></i>
+              <span>Edit with ease</span>
+            </li>
+          </ul>
+          <a href="/login" class="sign-up-button-btn">Sign Up Now</a>
+        </div>
+        <div class="right-working-image">
+          <img src="/assets/how-it-works.png" alt="Power Finance" />
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %> 
+
+    <script>feather.replace();</script>
+    <script src="/public/js/script.js"></script>
+  </body>
+</html>

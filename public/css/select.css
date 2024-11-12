@@ -1,0 +1,53 @@
+ body {
+  margin: 0;
+  padding: 0;
+  background-color: #369dd1;
+}
+
+.box {
+  /* position: absolute; */
+  align-self: center;
+  top: 50%;
+  left: 50%;
+  /* transform: translate(-50%, -50%); */
+  
+}
+
+.box select {
+  background-color: white;
+  color: black;
+  padding: 0px;
+  /* width: 250px; */
+  border: 10px;
+  font-size: 20px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  -webkit-appearance: button;
+  appearance: button;
+  outline: none;
+  border-radius: 7px;
+}
+
+.box::before {
+  content: "\f13a";
+  font-family: FontAwesome;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0%;
+  height: 100%;
+  text-align: center;
+  font-size: 28px;
+  line-height: 45px;
+  color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.box:hover::before {
+  color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.box select option {
+  padding: 30px;
+} */

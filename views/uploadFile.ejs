@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Excel File</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/upload.css">
+</head>
+<body>
+    <%- include('partials/header2') %>
+
+    <div class=" ">
+        <h1>Upload an Excel File for Processing</h1>
+    
+        <!-- Form for file upload -->
+        <form id="uploadForm" action="/upload-file" method="POST" enctype="multipart/form-data">
+            <h3>Upload Files</h3>
+            <div class="drop_box">
+                <header>
+                    <h4>Select File here</h4>
+                </header>
+                <p>Files Supported: XLS, XLSX</p>
+    
+                <!-- File input field (hidden) -->
+                <input type="file" accept=".xls, .xlsx" id="fileInput" name="excelFile" style="display: none;" required>
+    
+                <!-- Single button to select file and trigger upload -->
+                <button type="button" class="btn2" id="chooseFileButton">Choose File</button>
+                <p id="fileNameDisplay"></p> <!-- Display the chosen file name here -->
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        const fileInput = document.getElementById("fileInput");
+        const chooseFileButton = document.getElementById("chooseFileButton");
+        const uploadForm = document.getElementById("uploadForm");
+        const fileNameDisplay = document.getElementById("fileNameDisplay");
+    
+        // When "Choose File" is clicked, open the file input dialog
+        chooseFileButton.onclick = () => {
+            fileInput.click();
+        };
+    
+        // When a file is selected, display the file name and submit the form automatically
+        fileInput.addEventListener("change", function () {
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                fileNameDisplay.textContent = `Uploading: ${fileName}`;
+    
+                // Automatically submit the form
+                uploadForm.submit();
+            }
+        });
+    </script>
+    
+    
+</body>
+</html>

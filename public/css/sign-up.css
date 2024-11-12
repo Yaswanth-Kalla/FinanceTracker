@@ -1,0 +1,95 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    margin-top: 86px;
+  }
+  
+form {
+    max-width: 350px;
+    width: 100%;
+}
+
+.signup-form {
+  display: grid;
+  align-self: center;
+  max-width: 350px;
+  padding: 25px;
+  background-color: #ffffff; /* Clean white background */
+  border-radius: 8px; /* Slightly more rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  gap: 15px; /* Spacing between form elements */
+  border: 1px solid #e0e0e0; /* Subtle border for a polished outline */
+  box-sizing: border-box;
+}
+
+.signup-form h2 {
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+span {
+  color: #e57373; /* Softer, more professional color */
+  font-size: 14px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: #555; /* Slightly muted color */
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+input[type="text"], 
+input[type="email"], 
+input[type="tel"], 
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="tel"]:focus, 
+input[type="password"]:focus {
+  border-color: #007bff; /* Blue focus color */
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #5ff1e0; /* Blue color for submit button */
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+  background-color: #013134; /* Darker shade on hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  background-color: #003f7f;
+  transform: scale(0.98); /* Slight shrink effect on click */
+}
+
+  

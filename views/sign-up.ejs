@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/favicon_io/android-chrome-512x512.png" sizes="64x64">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/specific.css">
+  <link rel="stylesheet" href="/css/sign-up.css">
+  <title>Sign Up - Finance Tracker</title>
+</head>
+
+<body>
+  <%- include('partials/header') %> <!-- Header include -->
+
+  <div class="container">
+    <form class="signup-form" action="/signup" method="post">
+      <h2>Sign Up</h2>
+
+      <!-- Render flash messages as hidden elements, and trigger alert only if there's a message -->
+      <script>
+        const errorMessage = "<%= error %>";
+        const successMessage = "<%= success %>";
+
+        if (errorMessage) {
+          alert(errorMessage);
+        }
+
+        if (successMessage) {
+          alert(successMessage);
+        }
+      </script>
+
+      <div class="form-group">
+        <label for="fullname">Full Name <span>*</span></label>
+        <input type="text" id="fullname" name="fullname" required>
+      </div>
+      <div class="form-group">
+        <label for="username">Username <span>*</span></label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password <span>*</span></label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password <span>*</span></label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required>
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <%- include('partials/footer') %> <!-- Footer include -->
+  <script>feather.replace();</script>
+</body>
+</html>
