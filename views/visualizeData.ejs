@@ -45,9 +45,7 @@
         <option value="line">Line Chart</option>
         <option value="bar">Bar Chart</option>
         <option value="pie">Pie Chart</option>
-        <% if (!isPrediction) { %> 
-            <option value="transactionDetails">Transaction Details</option>
-        <% } %>
+        <option value="transactionDetails">Transaction Details</option>
     </select>
     </div>
 
@@ -65,37 +63,57 @@
             <h3>Pie Chart</h3>
             <canvas id="pieChart"></canvas>
         </div>
-        <% if (!isPrediction) { %> 
-            <div class="chart-container" id="transactionDetailsContainer" style="display: none;">
+        <div class="chart-container" id="transactionDetailsContainer" style="display: none;">
                 <h3>Transaction History Table</h3>
                 <table id="transactionTable" border="1">
                     <thead>
                         <tr>
+                            <% if (!isPrediction) { %>
                             <% tableData.headers.forEach(header => { %>
                                 <th><%= header %></th>
                             <% }); %>
+                            <% } else { %>
+                            <th>Month</th>
+                            <th>Expected Expense</th>
+                        <% } %>
                         </tr>
                     </thead>
                     <tbody>
+                        <% if (!isPrediction) { %>
                         <% tableData.rows.forEach((row, index) => { %>
-                            <tr data-year="<%= new Date(row[0]).getFullYear() %>" data-index="<%= index %>">
-                                <% row.forEach(cell => { %>
-                                    <td><%= cell %></td>
-                                <% }); %>
+                            <% const dateParts = row[0].split('/');
+                                const day = parseInt(dateParts[0], 10);
+                                const month = parseInt(dateParts[1], 10);
+                                const year = parseInt(dateParts[2], 10);
+                                const validYear = (month >= 1 && month <= 12 && day >= 1 && day <= 31) ? year : null;
+                            %>
+                            <% if (validYear !== null) { %>  <!-- Only render rows with valid years -->
+                                <tr data-year="<%= validYear %>" data-index="<%= index %>">
+                                    <% row.forEach(cell => { %>
+                                        <td><%= cell %></td>
+                                    <% }); %>
+                                </tr>
+                            <% } %>
+                        <% }); %>
+                    <% } else { %>
+                        <% tableData.rows.forEach(row => { %>
+                            <tr>
+                                <td><%= row[0] %></td> <!-- Month -->
+                                <td><%= row[1] %></td> <!-- Expected Expense -->
                             </tr>
                         <% }); %>
-                    </tbody>
-                </table>
+                    <% } %>
+                </tbody>
+            </table>
 
+            <% if (!isPrediction) { %>
                 <div id="paginationControls">
                     <button id="prevPage"> < </button>
-                    <span id="pageNumber" style="
-    padding-right: 5px;
-    padding-left: 5px;">Page 1</span>
+                    <span id="pageNumber" style="padding-right: 5px; padding-left: 5px;">Page 1</span>
                     <button id="nextPage">></button>
                 </div>
-            </div>
-        <% } %>
+            <% } %>
+        </div>
     </div>
 </div>
 
