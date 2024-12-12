@@ -1,4 +1,4 @@
-require("dotenv").config();
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -87,7 +87,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://expensetracker-lta3.onrender.com/auth/google",
+      callbackURL: "http://localhost:3000/auth/google/callback",
     },
     async function (accessToken, refreshToken, profile, cb) {
       try {
@@ -294,8 +294,12 @@ app.post('/upload-file', ensureAuthenticated, upload.single('excelFile'), async 
       return res.status(400).send('Invalid file format. Could not find transaction details.');
     }
 
-    // Process transaction rows
-    const transactionRows = jsonData.slice(headersRowIndex + 1);
+    // Process transaction rows and eliminate footer
+    const transactionRows = jsonData.slice(headersRowIndex + 1).filter(row => {
+      const isEmptyRow = row.every(cell => cell === undefined || cell === null || cell === '');
+      return !isEmptyRow; // Exclude empty footer rows
+    });
+
     const newTransactions = transactionRows.map(row => {
       // Format the date as DD/MM/YYYY
       let dateStr = row[0];
@@ -381,14 +385,42 @@ app.get('/visualize-data', ensureAuthenticated, async (req, res) => {
       return res.status(404).send('No data found for visualization.');
     }
 
-    // Extract years from transaction data
-    const years = Array.from(new Set(user.transactions.map(tx => tx.date.split('/')[2]))).sort((a, b) => b - a);
+    // Helper function to correctly convert YY to YYYY and handle both cases
+    const convertYear = (year) => {
+      year = year.toString(); // Ensure year is a string
+      if (year.length === 2) {
+        const numericYear = parseInt(year, 10);
+        return numericYear < 50 ? `20${year}` : `19${year}`; // Assuming 50-year window
+      } else if (year.length === 4) {
+        return year; // Already in YYYY format
+      }
+      return year; // Return as-is if it doesn't meet conditions (e.g., invalid formats are ignored)
+    };
 
-    const labels = user.processedData.map(entry => `${entry.Month}/${entry.Year}`);
+    // Extract and normalize years from transaction data
+    const years = Array.from(new Set(
+      user.transactions.map(tx => {
+        const year = tx.date.split('/')[2];
+        return convertYear(year);
+      })
+    )).sort((a, b) => b - a);
+
+    const labels = user.processedData.map(entry => {
+      const normalizedYear = convertYear(entry.Year);
+      return `${entry.Month}/${normalizedYear}`;
+    });
+
     const values = user.processedData.map(entry => entry.Monthly_Expenditure);
 
     const tableHeaders = ['Date', 'Narration', 'Reference No', 'Withdrawal Amount'];
-    const tableRows = user.transactions.map(tx => [tx.date, tx.narration, tx.refNo, tx.withdrawalAmount]);
+    const tableRows = user.transactions.map(tx => {
+      
+      const dateParts = tx.date.split('/');
+      dateParts[2] = convertYear(dateParts[2]); // Normalize the year if needed
+      const normalizedDate = dateParts.join('/');
+      
+      return [normalizedDate, tx.narration, tx.refNo, tx.withdrawalAmount];
+    });
 
     res.render('visualizeData', {
       isPrediction: false, // Tracking data, so not a prediction
@@ -407,6 +439,7 @@ app.get('/visualize-data', ensureAuthenticated, async (req, res) => {
     res.status(500).send('Error loading data for visualization.');
   }
 });
+
 
 
 app.get('/predict-expenditure', ensureAuthenticated, async (req, res) => {
@@ -432,8 +465,8 @@ app.get('/predict-expenditure', ensureAuthenticated, async (req, res) => {
         const labels = predictions.map(pred => pred.Month_Name);
         const values = predictions.map(pred => pred.Predicted_Monthly_Expenditure);
 
-        const tableHeaders = ['Month', 'Month Name', 'Predicted Monthly Expenditure'];
-        const tableRows = predictions.map(pred => [pred.Month, pred.Month_Name, pred.Predicted_Monthly_Expenditure]);
+        const tableHeaders = ['Month Name', 'Predicted Monthly Expenditure'];
+        const tableRows = predictions.map(pred => [pred.Month_Name, pred.Predicted_Monthly_Expenditure]);
 
         res.render('visualizeData', {
           isPrediction: true, // Flag for prediction visualization
