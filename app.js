@@ -239,18 +239,15 @@ app.post(
 app.get('/auth/google', 
   passport.authenticate('google', {
     scope: ['profile', 'email'], // Request profile and email scopes
-    accessType: 'offline',        // Request offline access (refresh token)
   })
 );
 
 // Google callback route
-app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/login' }),  // Redirect to login route on failure
-  function(req, res) {
-    // Successful authentication, redirect to /excelfileuploadation
-    res.redirect('/excelfileuploadation');
-  }
-);
+ app.get( '/auth/google/callback',
+        passport.authenticate( 'google', {
+            successRedirect: '/excelfileuploadation',
+            failureRedirect: '/login'
+    }));
 
 
 
