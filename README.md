@@ -92,7 +92,7 @@ Contributions are welcome! Please fork this repository and submit a pull request
 - [VISHESH](https://github.com/VisheshChowdary)
 - [PRANAV](https://github.com/Pranav4005)
 - [HARSHA](https://github.com/)
-- [JAYA KRISHNA](https://github.com/)
+- [JAYA KRISHNA](https://github.com/Krishna-JK-14)
 
 
 
